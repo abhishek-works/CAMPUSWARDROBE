@@ -1,0 +1,242 @@
+/* ===== Product Detail Page ===== */
+
+.product-detail .container {
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-3xl);
+}
+
+.pd-back {
+  margin-bottom: var(--space-lg);
+}
+
+.pd-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+/* Gallery */
+.pd-gallery {
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-lg));
+}
+
+.pd-main-image-wrap {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-md);
+}
+
+.pd-main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-thumbnails {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.pd-thumbnail {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: none;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast);
+}
+
+.pd-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-thumbnail-active {
+  border-color: var(--accent-violet);
+}
+
+.pd-thumbnail:hover {
+  border-color: var(--accent-violet);
+}
+
+/* Info */
+.pd-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.pd-info-header {
+  display: flex;
+  gap: var(--space-sm);
+  text-transform: capitalize;
+}
+
+.pd-title {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.pd-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* Pricing */
+.pd-pricing {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.pd-price-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  flex: 1;
+}
+
+.pd-price-icon {
+  font-size: 1.5rem;
+  color: var(--accent-violet);
+}
+
+.pd-price-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pd-price-unit {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Details */
+.pd-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.pd-detail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  background: var(--bg-glass);
+  border-radius: var(--radius-md);
+}
+
+.pd-detail svg {
+  color: var(--accent-violet);
+  font-size: 1rem;
+}
+
+.pd-detail strong {
+  color: var(--text-primary);
+}
+
+/* Tags */
+.pd-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Owner Card */
+.pd-owner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.pd-owner-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gradient-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.pd-owner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pd-owner-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pd-owner-bio {
+  font-size: 0.813rem;
+  color: var(--text-muted);
+}
+
+.pd-owner-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--accent-amber);
+  font-size: 0.938rem;
+}
+
+.pd-owner-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.pd-owner-notice svg {
+  color: var(--accent-blue);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-gallery {
+    position: static;
+  }
+
+  .pd-title {
+    font-size: 1.5rem;
+  }
+
+  .pd-pricing {
+    flex-direction: column;
+  }
+}

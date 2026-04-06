@@ -1,0 +1,175 @@
+/* ===== My Bookings Page ===== */
+
+.bookings-page .container {
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-3xl);
+}
+
+.bookings-header {
+  margin-bottom: var(--space-xl);
+}
+
+.bookings-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+/* Tabs */
+.bookings-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  padding: 4px;
+  background: var(--bg-glass);
+  border-radius: var(--radius-lg);
+  width: fit-content;
+}
+
+.bookings-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bookings-tab:hover {
+  color: var(--text-primary);
+}
+
+.bookings-tab-active {
+  background: var(--bg-card-hover);
+  color: var(--accent-violet);
+  box-shadow: var(--shadow-sm);
+}
+
+.bookings-tab-count {
+  padding: 2px 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-violet);
+}
+
+/* Booking Cards */
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.booking-card {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-md);
+}
+
+.booking-card-image {
+  width: 100px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-glass);
+}
+
+.booking-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 2rem;
+}
+
+.booking-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.booking-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.booking-card-top h4 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.booking-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.booking-card-type,
+.booking-card-dates {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.813rem;
+  color: var(--text-muted);
+}
+
+.booking-card-bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.booking-card-price {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-violet);
+}
+
+.booking-card-person {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .bookings-tabs {
+    width: 100%;
+  }
+
+  .bookings-tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-card {
+    flex-direction: column;
+  }
+
+  .booking-card-image {
+    width: 100%;
+    height: 160px;
+  }
+}

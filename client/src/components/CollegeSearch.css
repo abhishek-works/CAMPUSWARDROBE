@@ -1,0 +1,117 @@
+.college-search {
+  position: relative;
+  width: 100%;
+}
+
+.college-search-input-wrap {
+  position: relative;
+}
+
+.college-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.college-search-input {
+  padding-left: 40px !important;
+}
+
+.college-search-spinner {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-violet);
+  border-radius: 50%;
+  animation: loaderSpin 0.6s linear infinite;
+}
+
+.college-search-selected {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  padding: 8px 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-md);
+  font-size: 0.813rem;
+  color: var(--accent-violet);
+}
+
+.college-search-domain {
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.college-search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 50;
+  padding: var(--space-xs);
+}
+
+.college-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.college-search-item:hover {
+  background: var(--bg-glass);
+}
+
+.college-search-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.college-search-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.college-search-item-location {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.college-search-item-domain {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.college-search-empty {
+  padding: var(--space-lg);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

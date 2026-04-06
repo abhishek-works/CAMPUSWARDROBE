@@ -1,0 +1,134 @@
+/* ===== Browse Page ===== */
+
+.browse-page .container {
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-3xl);
+}
+
+.browse-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  gap: var(--space-md);
+}
+
+.browse-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+.browse-header p {
+  font-size: 1rem;
+}
+
+.browse-filter-toggle {
+  display: none;
+}
+
+/* Filters */
+.browse-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.browse-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.browse-filter-label {
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.browse-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.browse-chip {
+  padding: 6px 14px;
+  font-size: 0.813rem;
+  font-weight: 450;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-transform: capitalize;
+}
+
+.browse-chip:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.browse-chip-active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: var(--accent-violet);
+}
+
+/* Products Grid */
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.browse-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-2xl);
+}
+
+@media (max-width: 1024px) {
+  .browse-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .browse-filter-toggle {
+    display: flex;
+  }
+
+  .browse-filters {
+    display: none;
+  }
+
+  .browse-filters-open {
+    display: flex;
+  }
+
+  .browse-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  .browse-header h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .browse-grid {
+    grid-template-columns: 1fr;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
