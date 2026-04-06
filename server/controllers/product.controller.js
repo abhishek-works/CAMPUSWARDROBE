@@ -1,5 +1,4 @@
-const Product = require('../models/Product');
-const User = require('../models/User');
+const { prisma } = require('../config/db');
 
 // @route   POST api/products
 // @desc    Create a product (requires auth + multipart form data)
@@ -15,28 +14,38 @@ exports.createProduct = async (req, res) => {
     // Get image URLs from Cloudinary multer parser
     const images = req.files ? req.files.map(file => file.path) : [];
 
-    const newProduct = new Product({
-      owner: req.user.id,
-      collegeID: req.user.collegeID, // Scoped to user's college domain
-      title,
-      description,
-      category,
-      size,
-      brand,
-      color,
-      condition,
-      pricing,
-      availability: 'available',
-      tags,
-      images
+    const product = await prisma.product.create({
+      data: {
+        ownerId: req.user.id,
+        collegeDomain: req.user.collegeID, // Scoped to user's college domain
+        title,
+        description: description || "",
+        category,
+        size,
+        brand: brand || "",
+        color: color || "",
+        condition: condition || "good",
+        hourlyPrice: pricing.hourly,
+        nightlyPrice: pricing.nightly,
+        tags,
+        images
+      }
     });
 
-    const product = await newProduct.save();
-
     // Increment user listings count
-    await User.findByIdAndUpdate(req.user.id, { $inc: { totalListings: 1 } });
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { totalListings: { increment: 1 } }
+    });
 
-    res.json(product);
+    // The frontend might expect product structure slightly different (e.g., pricing.hourly).
+    // Let's format it for frontend compatibility:
+    const formattedProduct = {
+      ...product,
+      pricing: { hourly: product.hourlyPrice, nightly: product.nightlyPrice }
+    };
+
+    res.json(formattedProduct);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error in creating product');
@@ -51,21 +60,37 @@ exports.getProducts = async (req, res) => {
     const { category, size, limit = 20, page = 1 } = req.query;
     
     // Filter by user's campusID automatically!
-    const query = { 
-      collegeID: req.user.collegeID,
+    const whereClause = { 
+      collegeDomain: req.user.collegeID,
       availability: 'available' 
     };
 
-    if (category) query.category = category;
-    if (size) query.size = size;
+    if (category) whereClause.category = category;
+    if (size) whereClause.size = size;
 
-    const products = await Product.find(query)
-      .populate('owner', 'name profilePic ratings') // Populate owner basic details
-      .sort({ createdAt: -1 })
-      .limit(Number(limit))
-      .skip((Number(page) - 1) * Number(limit));
+    const products = await prisma.product.findMany({
+      where: whereClause,
+      include: {
+        owner: {
+          select: { name: true, profilePic: true, ratingAverage: true, ratingCount: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: Number(limit),
+      skip: (Number(page) - 1) * Number(limit)
+    });
 
-    res.json(products);
+    // Format output mapping for frontend backward compatibility
+    const formattedProducts = products.map(p => ({
+      ...p,
+      pricing: { hourly: p.hourlyPrice, nightly: p.nightlyPrice },
+      owner: {
+        ...p.owner,
+        ratings: { average: p.owner.ratingAverage, count: p.owner.ratingCount }
+      }
+    }));
+
+    res.json(formattedProducts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error fetching products');
@@ -77,23 +102,36 @@ exports.getProducts = async (req, res) => {
 // @access  Private
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate('owner', 'name profilePic ratings bio');
+    const product = await prisma.product.findUnique({
+      where: { id: req.params.id },
+      include: {
+        owner: {
+          select: { id: true, name: true, profilePic: true, ratingAverage: true, ratingCount: true, bio: true }
+        }
+      }
+    });
 
     if (!product) {
       return res.status(404).json({ msg: 'Product not found' });
     }
 
-    // Ensure user is seeing a product from their own college
-    if (product.collegeID !== req.user.collegeID) {
+    if (product.collegeDomain !== req.user.collegeID) {
       return res.status(403).json({ msg: 'Unauthorized to view products outside your campus' });
     }
 
-    res.json(product);
+    const formattedProduct = {
+      ...product,
+      pricing: { hourly: product.hourlyPrice, nightly: product.nightlyPrice },
+      owner: {
+        ...product.owner,
+        _id: product.owner.id, // Support _id dependency in frontend
+        ratings: { average: product.owner.ratingAverage, count: product.owner.ratingCount }
+      }
+    };
+
+    res.json(formattedProduct);
   } catch (err) {
     console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Product not found' });
-    }
     res.status(500).send('Server Error fetching product details');
   }
 };
@@ -103,8 +141,17 @@ exports.getProductById = async (req, res) => {
 // @access  Private
 exports.getMyProducts = async (req, res) => {
   try {
-    const products = await Product.find({ owner: req.user.id }).sort({ createdAt: -1 });
-    res.json(products);
+    const products = await prisma.product.findMany({
+      where: { ownerId: req.user.id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const formattedProducts = products.map(p => ({
+      ...p,
+      pricing: { hourly: p.hourlyPrice, nightly: p.nightlyPrice }
+    }));
+
+    res.json(formattedProducts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error fetching your products');

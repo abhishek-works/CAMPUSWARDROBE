@@ -1,49 +1,53 @@
 require('dotenv').config({ path: __dirname + '/../.env' });
-const mongoose = require('mongoose');
-const College = require('../models/College');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const colleges = [
-  { name: 'IIT Delhi', domain: 'iitd.ac.in', location: { city: 'New Delhi', state: 'Delhi' } },
-  { name: 'IIT Bombay', domain: 'iitb.ac.in', location: { city: 'Mumbai', state: 'Maharashtra' } },
-  { name: 'IIT Madras', domain: 'iitm.ac.in', location: { city: 'Chennai', state: 'Tamil Nadu' } },
-  { name: 'IIT Kanpur', domain: 'iitk.ac.in', location: { city: 'Kanpur', state: 'Uttar Pradesh' } },
-  { name: 'IIT Kharagpur', domain: 'iitkgp.ac.in', location: { city: 'Kharagpur', state: 'West Bengal' } },
-  { name: 'NIT Trichy', domain: 'nitt.edu', location: { city: 'Trichy', state: 'Tamil Nadu' } },
-  { name: 'NIT Warangal', domain: 'nitw.ac.in', location: { city: 'Warangal', state: 'Telangana' } },
-  { name: 'NIT Surathkal', domain: 'nitk.ac.in', location: { city: 'Mangalore', state: 'Karnataka' } },
-  { name: 'BITS Pilani', domain: 'bits-pilani.ac.in', location: { city: 'Pilani', state: 'Rajasthan' } },
-  { name: 'VIT Vellore', domain: 'vit.ac.in', location: { city: 'Vellore', state: 'Tamil Nadu' } },
-  { name: 'SRM Chennai', domain: 'srmist.edu.in', location: { city: 'Chennai', state: 'Tamil Nadu' } },
-  { name: 'SRCC DU', domain: 'srcc.edu', location: { city: 'New Delhi', state: 'Delhi' } },
-  { name: 'Hindu College DU', domain: 'hinducollege.ac.in', location: { city: 'New Delhi', state: 'Delhi' } },
-  { name: 'St. Stephens DU', domain: 'ststephens.edu', location: { city: 'New Delhi', state: 'Delhi' } },
+  { name: 'IIT Delhi', domain: 'iitd.ac.in', city: 'New Delhi', state: 'Delhi' },
+  { name: 'IIT Bombay', domain: 'iitb.ac.in', city: 'Mumbai', state: 'Maharashtra' },
+  { name: 'IIT Madras', domain: 'iitm.ac.in', city: 'Chennai', state: 'Tamil Nadu' },
+  { name: 'IIT Kanpur', domain: 'iitk.ac.in', city: 'Kanpur', state: 'Uttar Pradesh' },
+  { name: 'IIT Kharagpur', domain: 'iitkgp.ac.in', city: 'Kharagpur', state: 'West Bengal' },
+  { name: 'NIT Trichy', domain: 'nitt.edu', city: 'Trichy', state: 'Tamil Nadu' },
+  { name: 'NIT Warangal', domain: 'nitw.ac.in', city: 'Warangal', state: 'Telangana' },
+  { name: 'NIT Surathkal', domain: 'nitk.ac.in', city: 'Mangalore', state: 'Karnataka' },
+  { name: 'BITS Pilani', domain: 'bits-pilani.ac.in', city: 'Pilani', state: 'Rajasthan' },
+  { name: 'VIT Vellore', domain: 'vit.ac.in', city: 'Vellore', state: 'Tamil Nadu' },
+  { name: 'SRM Chennai', domain: 'srmist.edu.in', city: 'Chennai', state: 'Tamil Nadu' },
+  { name: 'SRCC DU', domain: 'srcc.edu', city: 'New Delhi', state: 'Delhi' },
+  { name: 'Hindu College DU', domain: 'hinducollege.ac.in', city: 'New Delhi', state: 'Delhi' },
+  { name: 'St. Stephens DU', domain: 'ststephens.edu', city: 'New Delhi', state: 'Delhi' },
   // Requested colleges
-  { name: 'KIET Group of Institutions', domain: 'kiet.edu', location: { city: 'Ghaziabad', state: 'Uttar Pradesh' } },
-  { name: 'ABES Engineering College', domain: 'abes.ac.in', location: { city: 'Ghaziabad', state: 'Uttar Pradesh' } },
-  { name: 'AKGEC', domain: 'akgec.ac.in', location: { city: 'Ghaziabad', state: 'Uttar Pradesh' } },
-  { name: 'ABSIT', domain: 'absit.edu.in', location: { city: 'Ghaziabad', state: 'Uttar Pradesh' } },
-  { name: 'RKGIT', domain: 'rkgit.edu.in', location: { city: 'Ghaziabad', state: 'Uttar Pradesh' } },
-  { name: 'SRM Delhi NCR', domain: 'srmup.in', location: { city: 'Modinagar', state: 'Uttar Pradesh' } }, // Assuming domain srmup.in based on SRM Modinagar campus
-  { name: 'ITS Engineering College', domain: 'its.edu.in', location: { city: 'Greater Noida', state: 'Uttar Pradesh' } }
+  { name: 'KIET Group of Institutions', domain: 'kiet.edu', city: 'Ghaziabad', state: 'Uttar Pradesh' },
+  { name: 'ABES Engineering College', domain: 'abes.ac.in', city: 'Ghaziabad', state: 'Uttar Pradesh' },
+  { name: 'AKGEC', domain: 'akgec.ac.in', city: 'Ghaziabad', state: 'Uttar Pradesh' },
+  { name: 'ABSIT', domain: 'absit.edu.in', city: 'Ghaziabad', state: 'Uttar Pradesh' },
+  { name: 'RKGIT', domain: 'rkgit.edu.in', city: 'Ghaziabad', state: 'Uttar Pradesh' },
+  { name: 'SRM Delhi NCR', domain: 'srmup.in', city: 'Modinagar', state: 'Uttar Pradesh' },
+  { name: 'ITS Engineering College', domain: 'its.edu.in', city: 'Greater Noida', state: 'Uttar Pradesh' }
 ];
 
 const seedColleges = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB connected for seeding defaults...');
+    await prisma.$connect();
+    console.log('PostgreSQL connected for seeding defaults...');
     
     // Clear existing
-    await College.deleteMany();
+    await prisma.college.deleteMany();
     console.log('Cleared existing colleges.');
 
     // Insert new
-    await College.insertMany(colleges);
+    await prisma.college.createMany({
+      data: colleges
+    });
     console.log('Colleges seeded successfully!');
 
     process.exit(0);
   } catch (err) {
     console.error('Error seeding data:', err);
     process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
 };
 

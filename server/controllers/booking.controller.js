@@ -1,5 +1,4 @@
-const Booking = require('../models/Booking');
-const Product = require('../models/Product');
+const { prisma } = require('../config/db');
 const { generateRandomCode, generateQRCodeURI } = require('../utils/generateQR');
 
 // @route   POST api/bookings/check
@@ -9,7 +8,7 @@ exports.checkAvailability = async (req, res) => {
   try {
     const { productId, start, end, type } = req.body; // type = 'hourly', 'nightly'
     
-    const product = await Product.findById(productId);
+    const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) {
       return res.status(404).json({ msg: 'Product not found' });
     }
@@ -19,11 +18,13 @@ exports.checkAvailability = async (req, res) => {
 
     // Overlap Check Algorithm:
     // startNew < endExisting AND endNew > startExisting
-    const conflict = await Booking.findOne({
-      product: productId,
-      status: { $nin: ['cancelled', 'completed'] },
-      'timeSlot.start': { $lt: requestedEnd },
-      'timeSlot.end': { $gt: requestedStart }
+    const conflict = await prisma.booking.findFirst({
+      where: {
+        productId: productId,
+        status: { notIn: ['cancelled', 'completed'] },
+        startTime: { lt: requestedEnd },
+        endTime: { gt: requestedStart }
+      }
     });
 
     if (conflict) {
@@ -36,11 +37,10 @@ exports.checkAvailability = async (req, res) => {
 
     if (type === 'hourly') {
       const hours = Math.ceil(durationMs / (1000 * 60 * 60));
-      totalPrice = product.pricing.hourly * hours;
+      totalPrice = (product.hourlyPrice || 0) * hours;
     } else if (type === 'nightly') {
       const nights = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
-      // if nights < 1 but booked overnight, default to 1
-      totalPrice = product.pricing.nightly * (nights === 0 ? 1 : nights);
+      totalPrice = (product.nightlyPrice || 0) * (nights === 0 ? 1 : nights);
     }
 
     res.json({ available: true, totalPrice });
@@ -57,50 +57,61 @@ exports.createBooking = async (req, res) => {
   try {
     const { productId, start, end, type, totalPrice } = req.body;
 
-    const product = await Product.findById(productId);
+    const product = await prisma.product.findUnique({ where: { id: productId } });
 
-    if (product.owner.toString() === req.user.id) {
+    if (product.ownerId === req.user.id) {
         return res.status(400).json({ msg: 'You cannot rent your own item' });
     }
 
-    // Generate Meeting Pass Details
-    // In a real app with payments, this happens AFTER successful payment
-    // For MVP we mock payment and auto-confirm
     const meetingCode = generateRandomCode(6);
     
-    const newBooking = new Booking({
-      product: productId,
-      renter: req.user.id,
-      owner: product.owner,
-      collegeID: req.user.collegeID,
-      type,
-      timeSlot: { start: new Date(start), end: new Date(end) },
-      totalPrice,
-      status: 'confirmed', // Assuming Instant confirmation MVP
+    let newBooking = await prisma.booking.create({
+      data: {
+        productId: productId,
+        renterId: req.user.id,
+        ownerId: product.ownerId,
+        collegeDomain: req.user.collegeID,
+        type,
+        startTime: new Date(start),
+        endTime: new Date(end),
+        totalPrice,
+        status: 'confirmed',
+        meetingPassCode: meetingCode
+      }
     });
 
-    await newBooking.save();
-
     // Increment bookings count
-    await Product.findByIdAndUpdate(productId, { $inc: { totalBookings: 1 } });
+    await prisma.product.update({
+      where: { id: productId },
+      data: { totalBookings: { increment: 1 } }
+    });
 
     // Generate QR using booking ID and meetingCode
     const qrPayload = {
-      bookingId: newBooking._id,
+      bookingId: newBooking.id,
       code: meetingCode,
       product: product.title
     };
     
-    newBooking.meetingPass.code = meetingCode;
-    newBooking.meetingPass.qrData = await generateQRCodeURI(qrPayload);
-    await newBooking.save();
-    
-    // Populate necessary fields before return
-    const populatedBooking = await Booking.findById(newBooking._id)
-      .populate('product', 'title images brand')
-      .populate('owner', 'name phone profilePic');
+    const qrData = await generateQRCodeURI(qrPayload);
 
-    res.json(populatedBooking);
+    newBooking = await prisma.booking.update({
+      where: { id: newBooking.id },
+      data: { meetingPassQrData: qrData },
+      include: {
+        product: { select: { title: true, images: true, brand: true } },
+        owner: { select: { name: true, phone: true, profilePic: true } }
+      }
+    });
+
+    // Match expected structure for frontend: meetingPass: { code, qrData }
+    const formattedBooking = {
+      ...newBooking,
+      meetingPass: { code: newBooking.meetingPassCode, qrData: newBooking.meetingPassQrData },
+      timeSlot: { start: newBooking.startTime, end: newBooking.endTime }
+    };
+
+    res.json(formattedBooking);
 
   } catch (err) {
     console.error(err.message);
@@ -113,17 +124,39 @@ exports.createBooking = async (req, res) => {
 // @access  Private
 exports.getMyBookings = async (req, res) => {
     try {
-        const rentals = await Booking.find({ renter: req.user.id })
-            .populate('product', 'title images brand size')
-            .populate('owner', 'name profilePic')
-            .sort({ createdAt: -1 });
+        const rentals = await prisma.booking.findMany({
+            where: { renterId: req.user.id },
+            include: {
+                product: { select: { title: true, images: true, brand: true, size: true } },
+                owner: { select: { name: true, profilePic: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
             
-        const lentOut = await Booking.find({ owner: req.user.id })
-            .populate('product', 'title images pricing')
-            .populate('renter', 'name profilePic')
-            .sort({ createdAt: -1 });
+        const lentOut = await prisma.booking.findMany({
+            where: { ownerId: req.user.id },
+            include: {
+                product: { select: { title: true, images: true, hourlyPrice: true, nightlyPrice: true } },
+                renter: { select: { name: true, profilePic: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
 
-        res.json({ rentals, lentOut });
+        // format to match original frontend expectations natively
+        const formatBooking = (b) => ({
+            ...b,
+            meetingPass: { code: b.meetingPassCode, qrData: b.meetingPassQrData },
+            timeSlot: { start: b.startTime, end: b.endTime },
+            product: b.product ? {
+              ...b.product,
+              pricing: { hourly: b.product.hourlyPrice, nightly: b.product.nightlyPrice }
+            } : null
+        });
+
+        res.json({ 
+            rentals: rentals.map(formatBooking), 
+            lentOut: lentOut.map(formatBooking) 
+        });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error fetching bookings');

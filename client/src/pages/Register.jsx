@@ -28,7 +28,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await register(name, email, password, selectedCollege._id);
+      await register(name, email, password, selectedCollege.id);
       toast.success('Welcome to CampusWardrobe!');
       navigate('/browse', { replace: true });
     } catch (err) {

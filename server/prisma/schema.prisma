@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model College {
+  id           String   @id @default(uuid())
+  name         String
+  domain       String   @unique
+  city         String
+  state        String
+  logoUrl      String   @default("")
+  studentCount Int      @default(0)
+  isActive     Boolean  @default(true)
+  users        User[]
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String
+  collegeId     String
+  college       College   @relation(fields: [collegeId], references: [id])
+  collegeDomain String    // Equivalent to Mongoose collegeID
+  profilePic    String    @default("")
+  bio           String    @default("")
+  phone         String    @default("")
+  ratingAverage Float     @default(0)
+  ratingCount   Int       @default(0)
+  totalListings Int       @default(0)
+  totalRentals  Int       @default(0)
+  isVerified    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  products      Product[]
+  rentals       Booking[] @relation("RenterBookings")
+  lentOut       Booking[] @relation("OwnerBookings")
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id])
+  collegeDomain String    // Equivalent to Mongoose collegeID
+  title         String
+  description   String    @default("")
+  images        String[]
+  category      String
+  size          String
+  brand         String    @default("")
+  color         String    @default("")
+  condition     String    @default("good")
+  hourlyPrice   Float?
+  nightlyPrice  Float?
+  availability  String    @default("available")
+  tags          String[]
+  totalBookings Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  bookings      Booking[]
+}
+
+model Booking {
+  id                  String   @id @default(uuid())
+  productId           String
+  product             Product  @relation(fields: [productId], references: [id])
+  renterId            String
+  renter              User     @relation("RenterBookings", fields: [renterId], references: [id])
+  ownerId             String
+  owner               User     @relation("OwnerBookings", fields: [ownerId], references: [id])
+  collegeDomain       String   // Equivalent to Mongoose collegeID
+  type                String   // 'hourly' | 'nightly'
+  startTime           DateTime
+  endTime             DateTime
+  totalPrice          Float
+  status              String   @default("pending") // 'pending','confirmed','active','completed','cancelled'
+  meetingPassCode     String   @default("")
+  meetingPassQrData   String?  @default("")
+  meetingPassRedeemed Boolean  @default(false)
+  createdAt           DateTime @default(now())
+}

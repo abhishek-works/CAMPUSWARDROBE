@@ -101,7 +101,7 @@ const CollegeSearch = ({ value, onChange, selectedCollege, onSelect }) => {
         <div className="college-search-dropdown animate-slide-down" id="college-dropdown">
           {results.map((college) => (
             <button
-              key={college._id}
+              key={college.id}
               className="college-search-item"
               onClick={() => handleSelect(college)}
               type="button"
