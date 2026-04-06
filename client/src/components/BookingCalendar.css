@@ -1,0 +1,222 @@
+.booking-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+}
+
+/* Type Toggle */
+.bc-type-toggle {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 4px;
+  background: var(--bg-glass);
+  border-radius: var(--radius-md);
+}
+
+.bc-type-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bc-type-btn:hover {
+  color: var(--text-primary);
+}
+
+.bc-type-active {
+  background: var(--bg-card-hover);
+  color: var(--accent-violet);
+  box-shadow: var(--shadow-sm);
+}
+
+.bc-type-price {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Calendar Header */
+.bc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bc-month-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bc-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1.125rem;
+  transition: all var(--transition-fast);
+}
+
+.bc-nav-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+/* Weekdays */
+.bc-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.bc-weekday {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 8px 0;
+}
+
+/* Days */
+.bc-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.bc-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  font-size: 0.813rem;
+  font-weight: 450;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.bc-day:hover:not(:disabled) {
+  background: var(--bg-glass);
+}
+
+.bc-day-outside {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.bc-day-past {
+  color: var(--text-muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.bc-day-today {
+  border: 1px solid var(--accent-violet);
+  color: var(--accent-violet);
+  font-weight: 600;
+}
+
+.bc-day-selected {
+  background: var(--accent-violet) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.bc-day-end {
+  background: var(--accent-blue) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.bc-day-range {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: var(--accent-violet) !important;
+}
+
+/* Time Selectors */
+.bc-time-selectors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+/* Nightly Info */
+.bc-nightly-info {
+  padding: var(--space-md);
+  background: var(--bg-glass);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bc-nightly-info strong {
+  color: var(--text-primary);
+}
+
+.bc-nightly-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Actions */
+.bc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bc-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 12px var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.bc-result-available {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--accent-green);
+}
+
+.bc-result-unavailable {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+}
+
+.bc-result strong {
+  color: var(--text-primary);
+}

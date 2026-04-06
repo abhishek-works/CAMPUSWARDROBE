@@ -1,0 +1,169 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--space-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  animation: fadeInUp 0.3s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: var(--bg-glass);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+/* Meeting Pass */
+.mp-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.mp-icon {
+  font-size: 2.5rem;
+  color: var(--accent-green);
+  margin-bottom: var(--space-sm);
+}
+
+.mp-header h3 {
+  margin-bottom: 4px;
+}
+
+.mp-header p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.mp-qr-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.mp-qr-image {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-lg);
+  background: white;
+  padding: var(--space-md);
+}
+
+.mp-qr-placeholder {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  background: var(--bg-glass);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.mp-qr-placeholder svg {
+  font-size: 3rem;
+}
+
+.mp-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--bg-glass);
+  border-radius: var(--radius-md);
+}
+
+.mp-code-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mp-code-value {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-violet);
+}
+
+.mp-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.mp-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.mp-detail-label {
+  font-size: 0.813rem;
+  color: var(--text-muted);
+}
+
+.mp-detail-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mp-detail-total {
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-color);
+}
+
+.mp-detail-total .mp-detail-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-violet);
+}
+
+.mp-status {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+}

@@ -1,0 +1,200 @@
+/* ===== My Listings Page ===== */
+
+.mylistings-page .container {
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-3xl);
+}
+
+/* Profile */
+.ml-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+  background: var(--gradient-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.ml-profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.ml-profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ml-profile-info h2 {
+  font-size: 1.5rem;
+}
+
+.ml-profile-info p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.ml-profile-stats {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.ml-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ml-stat svg {
+  font-size: 1.25rem;
+  color: var(--accent-violet);
+}
+
+.ml-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ml-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Header */
+.ml-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+/* Grid */
+.ml-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.ml-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ml-card:hover {
+  transform: translateY(-4px);
+}
+
+.ml-card-image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--bg-glass);
+}
+
+.ml-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.ml-card:hover .ml-card-image img {
+  transform: scale(1.05);
+}
+
+.ml-card-image .badge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  text-transform: capitalize;
+}
+
+.ml-card-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ml-card-body h4 {
+  font-size: 0.938rem;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ml-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.ml-card-size {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  background: var(--bg-glass);
+  border-radius: var(--radius-sm);
+}
+
+.ml-card-pricing {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.ml-card-pricing span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: var(--accent-violet);
+}
+
+.ml-card-pricing svg {
+  font-size: 0.75rem;
+}
+
+.ml-card-bookings {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .ml-profile {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ml-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .ml-grid {
+    grid-template-columns: 1fr;
+  }
+}
