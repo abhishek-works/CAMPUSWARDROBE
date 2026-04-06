@@ -81,7 +81,7 @@ const MyListings = () => {
         ) : (
           <div className="ml-grid">
             {products.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="ml-card glass-card" id={`listing-${product._id}`}>
+              <Link to={`/product/${product.id}`} key={product.id} className="ml-card glass-card" id={`listing-${product.id}`}>
                 <div className="ml-card-image">
                   <img src={product.images?.[0] || PLACEHOLDER_IMG} alt={product.title} />
                   <span className={`badge ${product.availability === 'available' ? 'badge-green' : product.availability === 'rented' ? 'badge-amber' : 'badge-red'}`}>

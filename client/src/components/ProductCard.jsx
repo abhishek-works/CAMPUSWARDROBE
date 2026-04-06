@@ -22,7 +22,7 @@ const ProductCard = ({ product }) => {
   const ownerInitial = ownerName.charAt(0).toUpperCase();
 
   return (
-    <Link to={`/product/${product._id}`} className="product-card glass-card" id={`product-${product._id}`}>
+    <Link to={`/product/${product.id}`} className="product-card glass-card" id={`product-${product.id}`}>
       <div className="product-card-image-wrap">
         <img src={imgSrc} alt={product.title} className="product-card-image" loading="lazy" />
         <span className={`badge product-card-category ${CATEGORY_COLORS[product.category] || 'badge-violet'}`}>

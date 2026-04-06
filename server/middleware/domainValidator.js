@@ -1,4 +1,4 @@
-const College = require('../models/College');
+const { prisma } = require('../config/db');
 
 const domainValidator = async (req, res, next) => {
   try {
@@ -15,8 +15,11 @@ const domainValidator = async (req, res, next) => {
     }
     const domain = emailParts[1].toLowerCase();
 
-    // Verify the college exists
-    const college = await College.findById(collegeId);
+    // Verify the college exists using Prisma findUnique
+    const college = await prisma.college.findUnique({
+      where: { id: collegeId }
+    });
+
     if (!college) {
       return res.status(404).json({ msg: 'Selected college not found' });
     }
@@ -29,6 +32,8 @@ const domainValidator = async (req, res, next) => {
     }
 
     // Inject college domain as collegeID to body for saving in User model
+    // Note: We'll keep calling it 'collegeID' for body compatibility with old frontend/controllers,
+    // but the Prisma schema expects 'collegeDomain'.
     req.body.collegeID = domain;
 
     next();

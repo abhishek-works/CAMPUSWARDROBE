@@ -1,4 +1,4 @@
-const College = require('../models/College');
+const { prisma } = require('../config/db');
 
 // @route   GET api/colleges
 // @desc    Search colleges by name
@@ -9,17 +9,21 @@ exports.searchColleges = async (req, res) => {
     let colleges;
 
     if (q) {
-      // Basic regex search for autocomplete
-      colleges = await College.find({ 
-        name: { $regex: q, $options: 'i' },
-        isActive: true
-      }).select('name domain location logoUrl').limit(10);
+      colleges = await prisma.college.findMany({
+        where: {
+          name: { contains: q, mode: 'insensitive' },
+          isActive: true
+        },
+        select: { id: true, name: true, domain: true, city: true, state: true, logoUrl: true },
+        take: 10
+      });
     } else {
-      // Return top colleges by student count or default
-      colleges = await College.find({ isActive: true })
-        .sort({ studentCount: -1 })
-        .select('name domain location logoUrl')
-        .limit(20);
+      colleges = await prisma.college.findMany({
+        where: { isActive: true },
+        orderBy: { studentCount: 'desc' },
+        select: { id: true, name: true, domain: true, city: true, state: true, logoUrl: true },
+        take: 20
+      });
     }
 
     res.json(colleges);
@@ -34,7 +38,9 @@ exports.searchColleges = async (req, res) => {
 // @access  Public
 exports.getCollegeById = async (req, res) => {
   try {
-    const college = await College.findById(req.params.id);
+    const college = await prisma.college.findUnique({
+      where: { id: req.params.id }
+    });
 
     if (!college) {
       return res.status(404).json({ msg: 'College not found' });
@@ -43,9 +49,6 @@ exports.getCollegeById = async (req, res) => {
     res.json(college);
   } catch (err) {
     console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'College not found' });
-    }
     res.status(500).send('Server Error');
   }
 };

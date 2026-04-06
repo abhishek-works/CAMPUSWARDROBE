@@ -1,5 +1,4 @@
-const User = require('../models/User');
-const College = require('../models/College');
+const { prisma } = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -7,35 +6,41 @@ const jwt = require('jsonwebtoken');
 // @desc    Register a user
 // @access  Public
 exports.registerUser = async (req, res) => {
-  const { name, email, password, collegeId, collegeID } = req.body; // collegeID is injected by domainValidator
+  const { name, email, password, collegeId, collegeDomain } = req.body; // updated for new domainValidator logic probably, or we just map it
+
+  // fallback if domainValidator uses collegeID still
+  const colDomain = collegeDomain || req.body.collegeID;
 
   try {
-    let user = await User.findOne({ email });
+    let user = await prisma.user.findUnique({ where: { email } });
 
     if (user) {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
-    user = new User({
-      name,
-      email,
-      password,
-      college: collegeId,
-      collegeID
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        collegeId: collegeId,
+        collegeDomain: colDomain,
+      }
     });
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    await user.save();
-
     // Increment student count in College doc
-    await College.findByIdAndUpdate(collegeId, { $inc: { studentCount: 1 } });
+    await prisma.college.update({
+      where: { id: collegeId },
+      data: { studentCount: { increment: 1 } }
+    });
 
     const payload = {
       user: {
         id: user.id,
-        collegeID: user.collegeID
+        collegeID: user.collegeDomain // keeping token payload consistent logically with existing frontend expectations
       }
     };
 
@@ -45,7 +50,7 @@ exports.registerUser = async (req, res) => {
       { expiresIn: '5 days' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: { id: user.id, name: user.name, email: user.email, collegeID: user.collegeID } });
+        res.json({ token, user: { id: user.id, name: user.name, email: user.email, collegeID: user.collegeDomain } });
       }
     );
   } catch (err) {
@@ -61,7 +66,7 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       return res.status(400).json({ msg: 'Invalid Credentials' });
@@ -76,7 +81,7 @@ exports.loginUser = async (req, res) => {
     const payload = {
       user: {
         id: user.id,
-        collegeID: user.collegeID
+        collegeID: user.collegeDomain
       }
     };
 
@@ -86,7 +91,7 @@ exports.loginUser = async (req, res) => {
       { expiresIn: '5 days' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: { id: user.id, name: user.name, email: user.email, collegeID: user.collegeID } });
+        res.json({ token, user: { id: user.id, name: user.name, email: user.email, collegeID: user.collegeDomain } });
       }
     );
   } catch (err) {
@@ -100,7 +105,19 @@ exports.loginUser = async (req, res) => {
 // @access  Private
 exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password').populate('college', 'name domain');
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      include: {
+        college: {
+          select: { name: true, domain: true }
+        }
+      }
+    });
+    
+    if (user) {
+      delete user.password; // do not return password hash
+    }
+    
     res.json(user);
   } catch (err) {
     console.error(err.message);
