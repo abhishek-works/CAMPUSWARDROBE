@@ -3,6 +3,14 @@ node_modules
 .env
 
 /generated/prisma
+<<<<<<< HEAD
+
+# Environment files
+.env
+.env.*
+!.env.example
+=======
+>>>>>>> 1f1a6fa13ec0f9d2cc004a2549892b25902a5884
 
 # Environment files
 .env
