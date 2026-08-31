@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  collegeId          String    // e.g. "2327CS1190"
+  password           String
+  name               String
+  college            String    // e.g. "KIET Group of Institutions"
+  phone              String?
+  avatarUrl          String?
+  role               String    @default("USER")
+  isEmailVerified    Boolean   @default(false)
+  emailVerifyToken   String?
+  resetPasswordToken String?
+  resetPasswordExpiry DateTime?
+  rating             Float     @default(0)
+  totalRatings       Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  wallet             Wallet?
+  listings           Listing[]
+  bookingsAsRenter   Booking[]      @relation("RenterBookings")
+  bookingsAsLender   Booking[]      @relation("LenderBookings")
+  reviewsGiven       Review[]       @relation("ReviewAuthor")
+  reviewsReceived    Review[]       @relation("ReviewTarget")
+  disputesRaised     Dispute[]      @relation("DisputeRaiser")
+  disputesAgainst    Dispute[]      @relation("DisputeAgainst")
+  favorites          Favorite[]
+  sentMessages       Message[]      @relation("SentMessages")
+  receivedMessages   Message[]      @relation("ReceivedMessages")
+  notifications      Notification[]
+
+  @@unique([college, collegeId])
+  @@map("users")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Listing {
+  id              String        @id @default(uuid())
+  title           String
+  description     String
+  size            String        // XS, S, M, L, XL, XXL, FREE
+  gender          String        // MALE, FEMALE, UNISEX
+  category        String        // T-Shirts, Shirts, Hoodies, Jackets, Jeans, Formal, Traditional, Ethnic, Accessories, Party, Sports, Casual
+  brand           String?
+  condition       String        @default("Like New") // Brand New, Like New, Good, Fair
+  color           String?
+  dailyPrice      Float         // Day rate
+  nightPrice      Float         @default(0) // Night rate
+  securityDeposit Float         @default(0)
+  images          String        @default("[]")
+  availableFrom   DateTime
+  availableTo     DateTime
+  pickupLocation  String        @default("Campus Gate / Main Reception")
+  notes           String?
+  status          String        @default("ACTIVE")
+  college         String        // Campus isolation
+  ownerId         String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+  reviews   Review[]
+  favorites Favorite[]
+  messages  Message[]
+
+  @@map("listings")
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  bookingCode   String        @unique // e.g. "CW-2327CS1190-1025"
+  listingId     String
+  renterId      String
+  lenderId      String
+  startDate     DateTime
+  endDate       DateTime
+  rentalType    String        @default("DAY")
+  totalDays     Int
+  rentalAmount  Float
+  depositAmount Float
+  totalAmount   Float
+  platformFee   Float         @default(0)
+  qrToken       String        @unique // Cryptographic verification token
+  status        String        @default("PENDING")
+  pickupTime    DateTime?
+  returnTime    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  renter   User      @relation("RenterBookings", fields: [renterId], references: [id])
+  lender   User      @relation("LenderBookings", fields: [lenderId], references: [id])
+  payment  Payment?
+  review   Review?
+  dispute  Dispute?
+  messages Message[]
+
+  @@map("bookings")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  bookingId         String        @unique
+  razorpayOrderId   String        @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount            Float
+  currency          String        @default("INR")
+  status            String        @default("PENDING")
+  escrowReleased    Boolean       @default(false)
+  escrowReleasedAt  DateTime?
+  refundedAt        DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  walletId    String
+  type        String
+  amount      Float
+  description String
+  referenceId String?
+  createdAt   DateTime        @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Review {
+  id             String   @id @default(uuid())
+  bookingId      String   @unique
+  listingId      String
+  authorId       String
+  targetId       String
+  rating         Int
+  comment        String?
+  clothingRating Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  author  User    @relation("ReviewAuthor", fields: [authorId], references: [id])
+  target  User    @relation("ReviewTarget", fields: [targetId], references: [id])
+
+  @@map("reviews")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  listingId  String?
+  bookingId  String?
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  listing  Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@map("messages")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // BOOKING_CONFIRMED, BOOKING_REQUEST, PICKUP_REMINDER, RETURN_REMINDER, QR_VERIFIED, NEW_MESSAGE, LISTING_BOOKED
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Dispute {
+  id          String        @id @default(uuid())
+  bookingId   String        @unique
+  raisedById  String
+  againstId   String
+  reason      String
+  description String
+  status      String        @default("OPEN")
+  resolution  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  raisedBy User    @relation("DisputeRaiser", fields: [raisedById], references: [id])
+  against  User    @relation("DisputeAgainst", fields: [againstId], references: [id])
+
+  @@map("disputes")
+}

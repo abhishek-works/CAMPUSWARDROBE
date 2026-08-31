@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 33% 93%; /* #F4EFE6 Raw Linen */
+    --foreground: 225 12% 8%; /* #111215 Deep Carbon */
+    --card: 40 30% 97%; /* #FAF7F2 */
+    --card-foreground: 225 12% 8%;
+    --popover: 40 30% 97%;
+    --popover-foreground: 225 12% 8%;
+    --primary: 11 80% 56%; /* #E85938 Kundan Rust */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 86%;
+    --secondary-foreground: 225 12% 8%;
+    --muted: 40 18% 88%;
+    --muted-foreground: 225 6% 45%;
+    --accent: 11 80% 95%;
+    --accent-foreground: 11 80% 56%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 38 18% 82%;
+    --input: 38 18% 82%;
+    --ring: 11 80% 56%;
+    --radius: 0.875rem;
+  }
+
+  .dark {
+    --background: 225 10% 5%; /* #0C0D0F Carbon */
+    --foreground: 40 33% 93%; /* #F4EFE6 Raw Linen */
+    --card: 225 10% 9%; /* #15171C */
+    --card-foreground: 40 33% 93%;
+    --popover: 225 10% 9%;
+    --popover-foreground: 40 33% 93%;
+    --primary: 11 80% 56%; /* #E85938 Kundan Rust */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 10% 14%;
+    --secondary-foreground: 40 33% 93%;
+    --muted: 225 10% 14%;
+    --muted-foreground: 225 6% 65%;
+    --accent: 11 80% 15%;
+    --accent-foreground: 11 80% 75%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 10% 16%;
+    --input: 225 10% 16%;
+    --ring: 11 80% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground selection:bg-[#E85938] selection:text-white font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+/* Textile & Thrift Tag Utilities */
+.thrift-stamp {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lookbook-crop {
+  position: relative;
+  overflow: hidden;
+}
+
+.lookbook-crop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+}
