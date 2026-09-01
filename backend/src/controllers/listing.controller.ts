@@ -68,10 +68,12 @@ export const createListing = async (
         const uploadPromises = (req.files as Express.Multer.File[]).map(
           (file) => uploadToCloudinary(file.buffer, "campuswardrobe/listings")
         );
-        const results = await Promise.all(uploadPromises);
-        imageUrls = [...imageUrls, ...results.map((r) => r.url)];
       } catch (err) {
         console.warn("Cloudinary upload fallback:", err);
+        const fallbackUrls = (req.files as Express.Multer.File[]).map(
+          (file) => `data:${file.mimetype};base64,${file.buffer.toString("base64")}`
+        );
+        imageUrls = [...imageUrls, ...fallbackUrls];
       }
     }
 
@@ -368,11 +370,19 @@ export const updateListing = async (
     }
 
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-      const uploadPromises = (req.files as Express.Multer.File[]).map(
-        (file) => uploadToCloudinary(file.buffer, "campuswardrobe/listings")
-      );
-      const results = await Promise.all(uploadPromises);
-      imageUrls = [...imageUrls, ...results.map((r) => r.url)];
+      try {
+        const uploadPromises = (req.files as Express.Multer.File[]).map(
+          (file) => uploadToCloudinary(file.buffer, "campuswardrobe/listings")
+        );
+        const results = await Promise.all(uploadPromises);
+        imageUrls = [...imageUrls, ...results.map((r) => r.url)];
+      } catch (err) {
+        console.warn("Cloudinary upload fallback in update:", err);
+        const fallbackUrls = (req.files as Express.Multer.File[]).map(
+          (file) => `data:${file.mimetype};base64,${file.buffer.toString("base64")}`
+        );
+        imageUrls = [...imageUrls, ...fallbackUrls];
+      }
     }
 
     const updateData: any = { images: JSON.stringify(imageUrls) };

@@ -196,6 +196,7 @@ export default function ListingDetailPage() {
                 alt={listing.title}
                 fill
                 priority
+                unoptimized={typeof (detailImg || getFallback(listing.category)) === "string" && (detailImg || getFallback(listing.category)).startsWith("data:")}
                 onError={() => setDetailImg(getFallback(listing.category))}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -233,7 +234,13 @@ export default function ListingDetailPage() {
                         : "border-transparent opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <Image src={img} alt="" fill className="object-cover" />
+                    <Image
+                      src={img}
+                      alt=""
+                      fill
+                      unoptimized={typeof img === "string" && img.startsWith("data:")}
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
