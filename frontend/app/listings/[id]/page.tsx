@@ -38,6 +38,40 @@ export default function ListingDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [detailImg, setDetailImg] = useState<string>("");
+
+  const getFallback = (cat?: string) => {
+    const c = (cat || "").toLowerCase();
+    if (c.includes("jean") || c.includes("trouser") || c.includes("pant")) {
+      return "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("formal") || c.includes("suit")) {
+      return "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("hoodie") || c.includes("sweat")) {
+      return "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("ethnic") || c.includes("lehenga") || c.includes("saree")) {
+      return "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("traditional") || c.includes("kurta")) {
+      return "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("jacket") || c.includes("denim")) {
+      return "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=1000&fit=crop&q=85";
+    }
+    if (c.includes("party") || c.includes("blazer")) {
+      return "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&fit=crop&q=85";
+    }
+    return "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1000&fit=crop&q=85";
+  };
+
+  useEffect(() => {
+    if (listing) {
+      const images = Array.isArray(listing.images) ? listing.images : [];
+      setDetailImg(images[selectedImage] || getFallback(listing.category));
+    }
+  }, [listing, selectedImage]);
 
   useEffect(() => {
     if (id) {
@@ -135,43 +169,8 @@ export default function ListingDetailPage() {
     );
   }
 
-  const getFallback = (cat: string) => {
-    const c = (cat || "").toLowerCase();
-    if (c.includes("jean") || c.includes("trouser") || c.includes("pant")) {
-      return "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("formal") || c.includes("suit")) {
-      return "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("hoodie") || c.includes("sweat")) {
-      return "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("ethnic") || c.includes("lehenga") || c.includes("saree")) {
-      return "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("traditional") || c.includes("kurta")) {
-      return "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("jacket") || c.includes("denim")) {
-      return "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=1000&fit=crop&q=85";
-    }
-    if (c.includes("party") || c.includes("blazer")) {
-      return "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&fit=crop&q=85";
-    }
-    return "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1000&fit=crop&q=85";
-  };
-
   const images = Array.isArray(listing.images) ? listing.images : [];
-  const primaryImage =
-    images[selectedImage] || getFallback(listing.category);
-  const [detailImg, setDetailImg] = useState(primaryImage);
-
-  useEffect(() => {
-    if (images[selectedImage]) {
-      setDetailImg(images[selectedImage]);
-    }
-  }, [selectedImage, listing]);
-
+  const displayImage = detailImg || images[selectedImage] || getFallback(listing.category);
   const isOwner = user?.id === listing.ownerId;
   const nightPrice = listing.nightPrice || Math.round(listing.dailyPrice * 2.2);
 
@@ -193,7 +192,7 @@ export default function ListingDetailPage() {
           <div className="lg:col-span-6 space-y-3.5">
             <div className="relative aspect-[3/3.8] rounded-2xl overflow-hidden bg-[#ECE6DA] dark:bg-[#15171C] border border-[#DCD5C6] dark:border-[#22262F]">
               <Image
-                src={detailImg}
+                src={detailImg || getFallback(listing.category)}
                 alt={listing.title}
                 fill
                 priority
